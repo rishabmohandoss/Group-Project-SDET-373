@@ -1,14 +1,15 @@
 {
   "expo": {
-    "name": "my-app",
+    "name": "MISE",
     "slug": "my-app",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "myapp",
-    "userInterfaceStyle": "automatic",
+    "userInterfaceStyle": "light",
     "ios": {
-      "icon": "./assets/expo.icon"
+      "icon": "./assets/expo.icon",
+      "bundleIdentifier": "com.rishabmohandoss.mise"
     },
     "android": {
       "adaptiveIcon": {
@@ -28,9 +29,17 @@
       [
         "expo-splash-screen",
         {
-          "backgroundColor": "#208AEF",
+          "backgroundColor": "#F4F2F0",
           "image": "./assets/images/splash-icon.png",
           "imageWidth": 76
+        }
+      ],
+      [
+        "@kingstinct/react-native-healthkit",
+        {
+          "background": false,
+          "NSHealthShareUsageDescription": "MISE reads your steps, resting heart rate, and sleep to show your wearable readings. When you sync, a summary is saved to your MISE account.",
+          "NSHealthUpdateUsageDescription": false
         }
       ]
     ],
