@@ -65,7 +65,8 @@
         {
           "locationWhenInUsePermission": "MISE uses your location to show restaurants and cafes near you."
         }
-      ]
+      ],
+      "@react-native-community/datetimepicker"
     ],
     "experiments": {
       "typedRoutes": true,
