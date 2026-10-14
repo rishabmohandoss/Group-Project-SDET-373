@@ -1,14 +1,19 @@
 import { router } from 'expo-router';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Pressable, Text, View } from 'react-native';
-import { Page, s, blue } from '@/components/mise';
+import { Action, Page, s, blue } from '@/components/mise';
+import { registerPushToken, scheduleMealReminders, sendTestNotification } from '@/lib/notifications';
 
 export default function Today() {
   const [feedback,setFeedback] = useState('');
+  const [notice,setNotice] = useState('');
+  useEffect(() => { scheduleMealReminders().catch(() => {}); registerPushToken().catch(() => {}); },[]);
   return <Page>
     <Text style={[s.small,{marginTop:-18}]}>Good morning. A little care, on your plate.</Text>
     <Text style={s.title}>Let’s put something{ '\n' }good on the table.</Text>
     <Text style={s.subtitle}>Built around your morning, your tastes, and the time you have. Nothing here takes long.</Text>
+    <Action onPress={async () => setNotice(await sendTestNotification() ? 'Sent. Look for it in a second.' : 'Notifications are off. Enable them in Settings (not supported on web).')}>Send me a notification</Action>
+    {!!notice && <Text accessibilityLiveRegion="polite" style={s.small}>{notice}</Text>}
     <Pressable accessibilityRole="button" onPress={() => router.navigate('/vitals')} style={[s.card,{flexDirection:'row',alignItems:'center',gap:12}]}>
       <Text style={{color:blue,fontSize:22}}>♧</Text><Text style={[s.small,{flex:1}]}>4 sample readings this morning — sleep, iron and heart rate shape this demo.</Text><Text style={s.link}>›</Text>
     </Pressable>
