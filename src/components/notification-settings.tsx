@@ -3,7 +3,6 @@ import { Pressable, StyleSheet, Switch, Text, View } from 'react-native';
 import { serif } from '@/components/mise';
 import { DEFAULT_SETTINGS, MEAL_LABELS, formatTime, loadSettings, saveSettings, sendTestNotification, type MealId, type NotificationSettings } from '@/lib/notifications';
 
-const STEP = 15;
 const blue = '#008BAD';
 
 export default function NotificationSettingsCard() {
@@ -31,12 +30,17 @@ export default function NotificationSettingsCard() {
         {(Object.keys(MEAL_LABELS) as MealId[]).map(id => {
           const meal = settings.meals[id];
           return (
-            <View key={id} style={styles.row}>
-              <Switch value={meal.enabled} onValueChange={enabled => update({ ...settings, meals: { ...settings.meals, [id]: { ...meal, enabled } } })} trackColor={{ true: blue }} />
-              <Text style={[styles.body, { flex: 1, marginLeft: 10, opacity: meal.enabled ? 1 : 0.5 }]}>{MEAL_LABELS[id]}</Text>
-              <Pressable accessibilityLabel={`Earlier ${MEAL_LABELS[id]}`} disabled={!meal.enabled} onPress={() => shift(id, -STEP)} style={styles.step}><Text style={styles.stepText}>−</Text></Pressable>
-              <Text style={[styles.time, { opacity: meal.enabled ? 1 : 0.5 }]}>{formatTime(meal.minutes)}</Text>
-              <Pressable accessibilityLabel={`Later ${MEAL_LABELS[id]}`} disabled={!meal.enabled} onPress={() => shift(id, STEP)} style={styles.step}><Text style={styles.stepText}>+</Text></Pressable>
+            <View key={id} style={{ gap: 8 }}>
+              <View style={styles.row}>
+                <Switch value={meal.enabled} onValueChange={enabled => update({ ...settings, meals: { ...settings.meals, [id]: { ...meal, enabled } } })} trackColor={{ true: blue }} />
+                <Text style={[styles.body, { flex: 1, marginLeft: 10, opacity: meal.enabled ? 1 : 0.5 }]}>{MEAL_LABELS[id]}</Text>
+                <Text style={[styles.time, { opacity: meal.enabled ? 1 : 0.5 }]}>{formatTime(meal.minutes)}</Text>
+              </View>
+              {meal.enabled ? <View style={[styles.row, { justifyContent: 'flex-end', gap: 6 }]}>
+                {([['−1 hr', -60], ['+1 hr', 60], ['−1 min', -1], ['+1 min', 1]] as const).map(([label, delta]) => (
+                  <Pressable key={label} accessibilityLabel={`${label} ${MEAL_LABELS[id]}`} onPress={() => shift(id, delta)} style={styles.step}><Text style={styles.stepText}>{label}</Text></Pressable>
+                ))}
+              </View> : null}
             </View>
           );
         })}
@@ -60,7 +64,7 @@ const styles = StyleSheet.create({
   body: { color: '#817D79', fontFamily: serif, fontSize: 14, lineHeight: 21 },
   row: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   time: { color: '#292725', fontFamily: serif, fontSize: 14, fontWeight: '700', minWidth: 76, textAlign: 'center' },
-  step: { width: 34, height: 34, backgroundColor: '#E8E5E2', alignItems: 'center', justifyContent: 'center' },
-  stepText: { color: blue, fontSize: 18, fontWeight: '700' },
+  step: { paddingHorizontal: 10, height: 34, backgroundColor: '#E8E5E2', alignItems: 'center', justifyContent: 'center' },
+  stepText: { color: blue, fontSize: 13, fontWeight: '700' },
   link: { color: blue, fontFamily: serif, fontSize: 14, fontWeight: '600' },
 });

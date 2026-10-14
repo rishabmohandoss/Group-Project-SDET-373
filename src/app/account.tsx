@@ -4,6 +4,7 @@ import { useCallback, useState } from 'react';
 import { ActivityIndicator, Alert, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import PreferencesCard from '@/components/preferences-card';
 import NotificationSettingsCard from '@/components/notification-settings';
 import { deleteAccount, getProfile, signOut as logOut, type Profile } from '@/lib/account';
 
@@ -65,6 +66,7 @@ export default function AccountScreen() {
             <Text style={styles.cardBody}>{profile ? 'Your profile is saved to your account. Wearable readings and menus are still demo data.' : 'You’re exploring a sample profile. No wearable is connected, and all readings are illustrative.'}</Text>
           </View>
 
+          <PreferencesCard />
           <NotificationSettingsCard />
 
           {profile ? (

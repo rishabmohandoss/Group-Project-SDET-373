@@ -1,10 +1,14 @@
 import { useCallback, useState } from 'react';
 import { useFocusEffect } from 'expo-router';
 import { ActivityIndicator, Pressable, Text, View } from 'react-native';
+import { Platform } from 'react-native';
 import { s, blue } from './mise';
 import { healthAvailabilityMessage, readAppleHealth } from '@/services/apple-health';
 import { healthUser, loadHealthSnapshot, saveHealthSnapshot, removeHealthSnapshot } from '@/lib/health-account';
 import type { HealthSnapshot } from '@/lib/health-data';
+
+const isAndroid = Platform.OS === 'android';
+const appName = isAndroid ? 'Health Connect' : 'Apple Health';
 
 export default function HealthConnection() {
   const [snapshot,setSnapshot] = useState<HealthSnapshot | null>(null);
@@ -23,7 +27,7 @@ export default function HealthConnection() {
       const user = await healthUser();
       const next = await readAppleHealth();
       if (next.steps === null && next.restingHeartRate === null && next.sleepMinutes === null) {
-        setMessage('No readable data found. Check MISE permissions in Apple Health and let your wearable finish syncing. Apple does not reveal whether read access was denied.');
+        setMessage('No readable data found. Check MISE permissions in ' + appName + ' and let your wearable finish syncing.');
         return;
       }
       await saveHealthSnapshot(next,user.id!);
@@ -38,15 +42,15 @@ export default function HealthConnection() {
     finally {setBusy(false);}
   };
   return <View style={s.card}>
-    <Text style={s.label}>YOUR WEARABLES · APPLE HEALTH</Text>
-    <Text style={s.heading}>Apple Watch and compatible apps</Text>
-    <Text style={s.body}>Reads steps, resting heart rate, and sleep from Apple Health. WHOOP can contribute supported readings when Apple Health sharing is enabled in the WHOOP app.</Text>
+    <Text style={s.label}>YOUR WEARABLES · {appName.toUpperCase()}</Text>
+    <Text style={s.heading}>{isAndroid ? 'Pixel Watch, Fitbit and compatible apps' : 'Apple Watch and compatible apps'}</Text>
+    <Text style={s.body}>{isAndroid ? 'Reads steps, resting heart rate, and sleep from Health Connect. Pixel Watch and Fitbit data appear there once the Fitbit app syncs to Health Connect.' : 'Reads steps, resting heart rate, and sleep from Apple Health. WHOOP can contribute supported readings when Apple Health sharing is enabled in the WHOOP app.'}</Text>
     {snapshot ? <View style={{gap:6}}>
       <Text style={s.label}>SAVED READINGS · {new Date(snapshot.syncedAt).toLocaleString()}</Text>
       <Text style={s.body}>Steps: {snapshot.steps ?? 'Unavailable'} · {snapshot.stepSource ?? 'No step source'}</Text>
       <Text style={s.body}>Resting heart rate: {snapshot.restingHeartRate != null ? `${Math.round(snapshot.restingHeartRate)} bpm` : 'Unavailable'}</Text>
       <Text style={s.body}>Sleep: {snapshot.sleepMinutes != null ? `${Math.floor(snapshot.sleepMinutes/60)}h ${snapshot.sleepMinutes%60}m` : 'Unavailable'} in the 24 hours before sync</Text>
-      <Text style={s.small}>Sources: {snapshot.sources.join(', ') || 'Apple Health'}. Steps use the source with the highest daily total to avoid adding overlapping device counts. Refresh manually for new readings.</Text>
+      <Text style={s.small}>Sources: {snapshot.sources.join(', ') || appName}. Steps use the source with the highest daily total to avoid adding overlapping device counts. Refresh manually for new readings.</Text>
     </View> : null}
     <Text style={s.small}>By tapping below, you choose to read the permitted data and upload this summary to your MISE account in Back4App. No raw samples are uploaded.</Text>
     {healthAvailabilityMessage ? <Text style={s.body}>{healthAvailabilityMessage}</Text> : <Pressable accessibilityRole="button" disabled={busy} onPress={sync} style={s.button}>

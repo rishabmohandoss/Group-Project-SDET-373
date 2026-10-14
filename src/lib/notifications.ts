@@ -79,7 +79,15 @@ export async function sendTestNotification() {
 }
 
 /** Schedules breakfast, lunch and dinner for the next week with a varied message each day. Safe to call on every launch. */
-export async function scheduleMealReminders() {
+let queue: Promise<unknown> = Promise.resolve();
+/** Runs scheduling one call at a time so overlapping calls can't both add reminders and create duplicates. */
+export function scheduleMealReminders() {
+  const run = queue.then(scheduleNow, scheduleNow);
+  queue = run.catch(() => {});
+  return run;
+}
+
+async function scheduleNow() {
   if (!(await ensurePermission())) return false;
   await Notifications.cancelAllScheduledNotificationsAsync();
   const settings = await loadSettings();

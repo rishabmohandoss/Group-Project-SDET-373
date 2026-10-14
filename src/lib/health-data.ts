@@ -1,5 +1,5 @@
 export type HealthSnapshot = {
-  provider: 'apple-health';
+  provider: 'apple-health' | 'health-connect';
   syncedAt: string;
   dayStart: string;
   sleepWindowStart: string;
