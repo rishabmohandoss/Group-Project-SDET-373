@@ -5,6 +5,7 @@ export type MealSlot = 'breakfast' | 'lunch' | 'dinner';
 export type Recipe = {
   id: string; name: string; category: string; area: string; image: string;
   instructions: string; ingredients: { name: string; measure: string }[]; source: string | null; video: string | null;
+  readyInMinutes?: number | null; servings?: number | null; pricePerServing?: number | null; calories?: number | null; protein?: number | null;
 };
 
 const SLOT_CATEGORIES: Record<MealSlot, string[]> = {

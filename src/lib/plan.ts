@@ -1,6 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Parse, backendConfigured } from '@/lib/back4app';
-import { candidateIds, pickRecipe, type MealSlot, type Recipe } from '@/lib/recipes';
+import { candidateIds, fits, pickRecipe, type MealSlot, type Recipe } from '@/lib/recipes';
 import type { FoodPreferences } from '@/lib/preferences';
 
 export const SLOTS: MealSlot[] = ['breakfast', 'lunch', 'dinner'];
@@ -25,7 +25,18 @@ export async function getOrCreatePlan(prefs: FoodPreferences, force = false): Pr
   await savePlan(plan);
   return plan;
 }
+/** Personalised recipes (cook time, cost, nutrition) from the Back4App Cloud Code function. Returns null when signed out or unavailable. */
+async function pickPersonalised(slot: MealSlot, prefs: FoodPreferences, exclude: string[]): Promise<Recipe | null> {
+  if (!backendConfigured || !Parse.User.current()) return null;
+  try {
+    const results = await Parse.Cloud.run('recipes', { slot, diet: prefs.diet, cuisines: prefs.cuisines, avoid: prefs.avoid, maxMinutes: prefs.maxMinutes }) as Recipe[];
+    return results.find(r => !exclude.includes(r.id) && fits(r, prefs) && (!prefs.maxPrice || (r.pricePerServing ?? 0) <= prefs.maxPrice)) ?? null;
+  } catch { return null; }
+}
+
 async function fill(plan: DayPlan, slot: MealSlot, prefs: FoodPreferences, skip: string[]) {
+  const personal = await pickPersonalised(slot, prefs, [...plan.used, ...skip]);
+  if (personal) { plan.meals[slot] = personal; plan.used.push(personal.id); return; }
   const ids = await candidateIds(slot, prefs, `${plan.date}:${slot}`);
   const recipe = await pickRecipe(ids, prefs, [...plan.used, ...skip]);
   if (recipe) { plan.meals[slot] = recipe; plan.used.push(recipe.id); }

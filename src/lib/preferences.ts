@@ -2,7 +2,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Parse, backendConfigured } from '@/lib/back4app';
 
 export type Diet = 'anything' | 'vegetarian' | 'vegan' | 'pescatarian';
-export type FoodPreferences = { diet: Diet; cuisines: string[]; avoid: string[] };
+export type FoodPreferences = { diet: Diet; cuisines: string[]; avoid: string[]; maxMinutes: number; maxPrice: number }; // 0 = no limit
 
 export const DIETS: { id: Diet; label: string }[] = [
   { id: 'anything', label: 'Anything' }, { id: 'vegetarian', label: 'Vegetarian' },
@@ -10,7 +10,7 @@ export const DIETS: { id: Diet; label: string }[] = [
 ];
 // Cuisines TheMealDB has recipes for.
 export const CUISINES = ['American', 'British', 'Chinese', 'French', 'Greek', 'Indian', 'Italian', 'Japanese', 'Mexican', 'Moroccan', 'Spanish', 'Thai', 'Turkish', 'Vietnamese'];
-export const DEFAULT_PREFERENCES: FoodPreferences = { diet: 'anything', cuisines: [], avoid: [] };
+export const DEFAULT_PREFERENCES: FoodPreferences = { diet: 'anything', cuisines: [], avoid: [], maxMinutes: 0, maxPrice: 0 };
 const KEY = 'mise.foodPreferences';
 
 export async function loadPreferences(): Promise<FoodPreferences> {

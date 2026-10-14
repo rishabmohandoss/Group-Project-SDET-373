@@ -10,6 +10,12 @@ export default function RecipeCard({ recipe, label, onSwap, swapping }: { recipe
       {label ? <Text style={s.label}>{label.toUpperCase()} · {recipe.area.toUpperCase()} · {recipe.category.toUpperCase()}</Text> : null}
       {recipe.image ? <Image source={{ uri: recipe.image }} style={{ width: '100%', height: 180 }} accessibilityLabel={recipe.name} /> : null}
       <Text style={s.heading}>{recipe.name}</Text>
+      {recipe.readyInMinutes || recipe.pricePerServing || recipe.calories ? <Text style={s.small}>{[
+        recipe.readyInMinutes ? `${recipe.readyInMinutes} min` : null,
+        recipe.pricePerServing != null ? `$${recipe.pricePerServing.toFixed(2)} per serving` : null,
+        recipe.calories != null ? `${Math.round(recipe.calories)} kcal` : null,
+        recipe.protein != null ? `${Math.round(recipe.protein)} g protein` : null,
+      ].filter(Boolean).join(' · ')}</Text> : null}
       <View style={{ flexDirection: 'row', gap: 18 }}>
         <Pressable accessibilityRole="button" onPress={() => setOpen(!open)}><Text style={s.link}>{open ? 'Hide recipe' : 'Show recipe'}</Text></Pressable>
         {onSwap ? <Pressable accessibilityRole="button" disabled={swapping} onPress={onSwap}>{swapping ? <ActivityIndicator color={blue} /> : <Text style={s.link}>Swap for another</Text>}</Pressable> : null}

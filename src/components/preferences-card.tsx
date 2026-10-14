@@ -33,6 +33,11 @@ export default function PreferencesCard() {
       <View style={styles.wrap}>{DIETS.map(d => chip(d.label, prefs.diet === d.id, () => update({ ...prefs, diet: d.id })))}</View>
       <Text style={styles.label}>Cuisines you like</Text>
       <View style={styles.wrap}>{CUISINES.map(c => chip(c, prefs.cuisines.includes(c), () => update({ ...prefs, cuisines: prefs.cuisines.includes(c) ? prefs.cuisines.filter(x => x !== c) : [...prefs.cuisines, c] })))}</View>
+      <Text style={styles.label}>Longest you will cook</Text>
+      <View style={styles.wrap}>{[[0, 'No limit'], [15, '15 min'], [30, '30 min'], [45, '45 min'], [60, '1 hr']].map(([m, l]) => chip(String(l), prefs.maxMinutes === m, () => update({ ...prefs, maxMinutes: Number(m) })))}</View>
+      <Text style={styles.label}>Budget per serving</Text>
+      <View style={styles.wrap}>{[[0, 'No limit'], [3, '$3'], [5, '$5'], [8, '$8'], [12, '$12']].map(([m, l]) => chip(String(l), prefs.maxPrice === m, () => update({ ...prefs, maxPrice: Number(m) })))}</View>
+      <Text style={styles.body}>Cook time and budget apply to personalised recipes, which need you to be signed in.</Text>
       <Text style={styles.label}>Foods to avoid (comma separated)</Text>
       <TextInput value={avoid} onChangeText={setAvoid} onEndEditing={() => update({ ...prefs, avoid: avoid.split(',').map(x => x.trim()).filter(Boolean) })} placeholder="mushrooms, peanuts" style={styles.input} autoCapitalize="none" />
       {note ? <Text style={styles.body}>{note}</Text> : null}
